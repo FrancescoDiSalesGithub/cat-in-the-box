@@ -8,6 +8,8 @@ public class QemuMachine
     private String name;
     private String path;
 
+    private QemuHardDrive drive;
+
 
     public void setName(String name) {
         this.name = name;
@@ -21,6 +23,10 @@ public class QemuMachine
         this.machineId = machineId;
     }
 
+    public void setDrive(QemuHardDrive drive) {
+        this.drive = drive;
+    }
+
     public String getName() {
         return name;
     }
@@ -31,5 +37,9 @@ public class QemuMachine
 
     public String getMachineId() {
         return machineId;
+    }
+
+    public QemuHardDrive getDrive() {
+        return drive;
     }
 }
