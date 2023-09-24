@@ -1,10 +1,14 @@
 package com.francescodisalesgithub.catinthebox.service;
 
+import com.francescodisalesgithub.catinthebox.model.InstalledQemu;
 import com.francescodisalesgithub.catinthebox.model.QemuMachine;
 import com.francescodisalesgithub.catinthebox.model.QemuOperation;
 import com.francescodisalesgithub.catinthebox.utils.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 @Service
 public class QemuService
@@ -13,29 +17,58 @@ public class QemuService
     @Autowired
     Security security;
 
-
-
-
     public QemuOperation createMachine(QemuMachine qemuMachine)
     {
         QemuOperation qemuOperation = new QemuOperation();
 
         try
         {
-            security.isPathInjection(qemuMachine.getPath());
+            RestTemplate restTemplate = new RestTemplate();
+            String urlInstallation = "http://localhost:6543/qemu/installed?application=qemu-system-x86_64";
+            URI uriInstallation = new URI(urlInstallation);
+            InstalledQemu responseInstallation = restTemplate.getForObject(uriInstallation, InstalledQemu.class);
 
-            if(security.isSecured())
+            assert responseInstallation != null;
+            if(responseInstallation.isInstalled())
             {
-                qemuOperation.setOperation("create");
-                qemuOperation.setStatus("OK");
-                qemuOperation.setError(null);
+                security.isPathInjection(qemuMachine.getPath());
+
+                if(security.isSecured())
+                {
+                    if(qemuMachine.getDrive() != null)
+                    {
+                        String command = "cd "+qemuMachine.getPath()+" ||  mkdir "+qemuMachine.getName()+"|| cd "+qemuMachine.getName();
+                        Runtime.getRuntime().exec(command);
+
+                        qemuOperation.setOperation("create");
+                        qemuOperation.setStatus("OK");
+                        qemuOperation.setError(null);
+                    }
+                    else
+                    {
+                        qemuOperation.setOperation("create");
+                        qemuOperation.setStatus("KO");
+                        qemuOperation.setError("Hard-drive parameter not present");
+                        return  qemuOperation;
+                    }
+
+
+                }
+                else
+                {
+                    qemuOperation.setOperation("create");
+                    qemuOperation.setStatus("KO");
+                    qemuOperation.setError("An invalid operation was done");
+                }
             }
             else
             {
                 qemuOperation.setOperation("create");
                 qemuOperation.setStatus("KO");
-                qemuOperation.setError(null);
+                qemuOperation.setError("application qemu is not installed");
             }
+
+
         }
         catch (Exception e)
         {
