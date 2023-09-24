@@ -41,7 +41,7 @@ public class QemuService
                     {
                         File directoryMachine = new File(qemuMachine.getPath()+"/"+qemuMachine.getName());
 
-                        if(directoryMachine.isDirectory() && !directoryMachine.exists())
+                        if(!directoryMachine.exists())
                         {
                             directoryMachine.mkdir();
                         }
