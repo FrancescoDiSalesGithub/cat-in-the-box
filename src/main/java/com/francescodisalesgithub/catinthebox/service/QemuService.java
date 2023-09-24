@@ -55,7 +55,7 @@ public class QemuService
 
                         qemuOperation.setOperation("create");
                         qemuOperation.setStatus("OK");
-                        qemuOperation.setError(null);
+                        qemuOperation.setError("operation completed virtual machine available at: "+qemuMachine.getPath()+"/"+qemuMachine.getName());
                     }
                     else
                     {
