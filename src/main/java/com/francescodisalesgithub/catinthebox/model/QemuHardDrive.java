@@ -3,7 +3,22 @@ package com.francescodisalesgithub.catinthebox.model;
 public class QemuHardDrive
 {
     private String name;
-    private long size;
+    private String size;
 
-    private String unit;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSize()
+    {
+        return size;
+    }
 }

@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.net.URI;
+import java.nio.file.FileSystem;
 
 @Service
 public class QemuService
@@ -37,8 +39,19 @@ public class QemuService
                 {
                     if(qemuMachine.getDrive() != null)
                     {
-                        String command = "cd "+qemuMachine.getPath()+" ||  mkdir "+qemuMachine.getName()+"|| cd "+qemuMachine.getName();
-                        Runtime.getRuntime().exec(command);
+                        File directoryMachine = new File(qemuMachine.getPath()+"/"+qemuMachine.getName());
+
+                        if(directoryMachine.isDirectory() && !directoryMachine.exists())
+                        {
+                            directoryMachine.mkdir();
+                        }
+                        else
+                        {
+                            qemuOperation.setOperation("create");
+                            qemuOperation.setStatus("KO");
+                            qemuOperation.setError("A virtual machine with the given name already exists.");
+                            return  qemuOperation;
+                        }
 
                         qemuOperation.setOperation("create");
                         qemuOperation.setStatus("OK");
